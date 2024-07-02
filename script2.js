@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBtn = document.getElementById('filterBtn');
     const clearAllBtn = document.getElementById('clearAllBtn');
     const taskTemplate = document.getElementById('taskTemplate');
+    const searchTaskInput = document.getElementById('searchTask');
+    const applyFilterBtn = document.getElementById('applyFilter');
+    const showAddTaskBtn = document.getElementById('showAddTaskBtn');
+    const taskAddBoxContainer = document.getElementById('taskAddBoxContainer');
 
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -11,16 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
-    function renderTasks() {
+    function renderTasks(tasksToRender = tasks) {
         taskList.innerHTML = '';
-        tasks.forEach((task, index) => {
+        tasksToRender.forEach((task, index) => {
             const taskElement = document.importNode(taskTemplate.content, true);
+            
+            const listItem = taskElement.querySelector('.task-item');
+            listItem.classList.add(`priority-${task.priority}`, `category-${task.category}`);
             
             taskElement.querySelector('.task-title').textContent = task.title;
             taskElement.querySelector('.task-description').textContent = task.description;
             taskElement.querySelector('.task-date').textContent = new Date(task.dateTime).toLocaleString();
             
-            const listItem = taskElement.querySelector('.task-item');
             if (task.completed) {
                 listItem.classList.add('completed');
             }
@@ -40,11 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = document.getElementById('taskTitle').value;
         const description = document.getElementById('taskDescription').value;
         const dateTime = document.getElementById('taskDateTime').value;
+        const category = document.getElementById('taskCategory').value;
+        const priority = document.getElementById('taskPriority').value;
 
-        tasks.push({ title, description, dateTime, completed: false });
+        tasks.push({ title, description, dateTime, category, priority, completed: false });
         saveTasks();
         renderTasks();
         addTaskForm.reset();
+
+        // Hide the add task form on small devices after adding a task
+        if (window.innerWidth < 992) {
+            taskAddBoxContainer.classList.remove('show');
+        }
     }
 
     function toggleComplete(index) {
@@ -67,26 +80,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function filterTasks() {
-        const filterOption = prompt('Enter filter option (all/active/completed):');
-        switch (filterOption.toLowerCase()) {
-            case 'active':
-                tasks = tasks.filter(task => !task.completed);
-                break;
-            case 'completed':
-                tasks = tasks.filter(task => task.completed);
-                break;
-            case 'all':
-            default:
-                // Do nothing, show all tasks
-                break;
-        }
-        renderTasks();
+    function searchTasks(searchTerm) {
+        const filteredTasks = tasks.filter(task => 
+            task.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            task.description.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        renderTasks(filteredTasks);
+    }
+
+    function applyFilter() {
+        const categoryFilter = document.getElementById('filterCategory').value;
+        const priorityFilter = document.getElementById('filterPriority').value;
+        const statusFilter = document.getElementById('filterStatus').value;
+
+        const filteredTasks = tasks.filter(task => 
+            (categoryFilter === '' || task.category === categoryFilter) &&
+            (priorityFilter === '' || task.priority === priorityFilter) &&
+            (statusFilter === '' || 
+                (statusFilter === 'active' && !task.completed) || 
+                (statusFilter === 'completed' && task.completed))
+        );
+
+        renderTasks(filteredTasks);
+        const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+        filterModal.hide();
     }
 
     addTaskForm.addEventListener('submit', addTask);
     clearAllBtn.addEventListener('click', clearAllTasks);
-    filterBtn.addEventListener('click', filterTasks);
+    filterBtn.addEventListener('click', () => {
+        const filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
+        filterModal.show();
+    });
+    searchTaskInput.addEventListener('input', (e) => searchTasks(e.target.value));
+    applyFilterBtn.addEventListener('click', applyFilter);
+
+    // Add event listener for the show add task button
+    showAddTaskBtn.addEventListener('click', () => {
+        taskAddBoxContainer.classList.add('show');
+    });
+
+    // Add event listener for window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 992) {
+            taskAddBoxContainer.classList.remove('show');
+        }
+    });
 
     renderTasks();
 });

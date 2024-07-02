@@ -1,4 +1,3 @@
-/* Global Styles */
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -11,7 +10,7 @@ body {
 }
 
 /* Task Add Box */
-.task-add-box {
+.task-add-box, .list-box {
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -19,35 +18,35 @@ body {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.task-add-box:hover {
+.task-add-box:hover, .list-box:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 
-.task-add-box h2 {
+.task-add-box h2, .list-box h2 {
     color: #4a4a4a;
     font-weight: 600;
 }
 
-#addTaskForm input, #addTaskForm textarea {
+#addTaskForm input, #addTaskForm textarea, #addTaskForm select {
     border: 2px solid #e0e0e0;
     border-radius: 10px;
     padding: 12px;
     transition: all 0.3s ease;
 }
 
-#addTaskForm input:focus, #addTaskForm textarea:focus {
+#addTaskForm input:focus, #addTaskForm textarea:focus, #addTaskForm select:focus {
     border-color: #764ba2;
     box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.2);
 }
 
-#addTaskForm button {
+#addTaskForm button, #showAddTaskBtn {
     background-color: #764ba2;
     border-color: #764ba2;
     transition: all 0.3s ease;
 }
 
-#addTaskForm button:hover {
+#addTaskForm button:hover, #showAddTaskBtn:hover {
     background-color: #5e3d82;
     border-color: #5e3d82;
     transform: scale(1.05);
@@ -163,11 +162,6 @@ body {
     font-size: 1.5rem;
 }
 
-@media (max-width: 767px) {
-    .footer .col-md-4:not(:last-child) {
-        margin-bottom: 1rem;
-    }
-}
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
@@ -178,9 +172,34 @@ body {
     animation: fadeIn 0.5s ease-out;
 }
 
+/* Priority Colors */
+.priority-high { border-left-color: #ff6b6b; }
+.priority-medium { border-left-color: #feca57; }
+.priority-low { border-left-color: #54a0ff; }
+
+/* Category Background Colors */
+.category-work { background-color: #54a0ff22; }
+.category-personal { background-color: #5cd6d622; }
+.category-shopping { background-color: #ff9ff322; }
+.category-health { background-color: #ff6b6b22; }
+
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
     .task-add-box, .list-box {
         margin-bottom: 30px;
+    }
+
+    #taskAddBoxContainer.show {
+        display: block !important;
+    }
+
+    #showAddTaskBtn {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    .footer .col-md-4:not(:last-child) {
+        margin-bottom: 1rem;
     }
 }
